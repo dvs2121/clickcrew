@@ -1,0 +1,291 @@
+.icon-button {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  color: var(--primary-color);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.icon-button:hover {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+.toast {
+  position: fixed;
+  z-index: 100;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(380px, calc(100vw - 32px));
+  padding: 14px 18px;
+  color: var(--surface-color);
+  background: var(--primary-color);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+}
+.modal-backdrop {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(24, 34, 29, 0.62);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.modal-backdrop.is-open {
+  opacity: 1;
+}
+.modal-dialog {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: min(90vh, 900px);
+  overflow-y: auto;
+  padding: 32px;
+  background: var(--surface-color);
+  box-shadow: var(--shadow);
+  transform: translateY(10px);
+  transition: transform 0.2s ease;
+}
+.is-open .modal-dialog {
+  transform: translateY(0);
+}
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  color: var(--muted-color);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+}
+.modal-dialog h2 {
+  margin: 0 32px 20px 0;
+  color: var(--primary-color);
+  font: 500 34px/1.15 var(--serif);
+}
+.booking-confirmation-copy {
+  max-width: 470px;
+  color: var(--muted-color);
+  line-height: 1.7;
+}
+.booking-confirmation-details {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+  padding: 17px 19px;
+  background: var(--background-color);
+}
+.booking-confirmation-details p {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  font-size: 13px;
+}
+.booking-confirmation-details span {
+  color: var(--muted-color);
+}
+.booking-confirmation-details strong {
+  color: var(--primary-color);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.drawer-backdrop {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  background: rgba(24, 34, 29, 0.46);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.filter-drawer {
+  position: fixed;
+  z-index: 71;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(390px, 90vw);
+  overflow: auto;
+  padding: 26px;
+  background: var(--background-color);
+  transform: translateX(102%);
+  transition: transform 0.28s ease;
+}
+.drawer-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.filter-drawer.is-open {
+  transform: translateX(0);
+}
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.drawer-header h2 {
+  margin: 0;
+  color: var(--primary-color);
+  font: 500 28px var(--serif);
+}
+.lightbox-image {
+  max-width: min(100%, 1100px);
+  max-height: 83vh;
+  object-fit: contain;
+}
+.lightbox-caption {
+  color: white;
+  text-align: center;
+  font-size: 12px;
+}
+.booking-summary {
+  margin: 20px 0;
+  padding: 17px;
+  background: #f2f0e8;
+  border-left: 2px solid var(--secondary-color);
+}
+.booking-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 5px 0;
+  font-size: 12px;
+}
+.booking-summary-total {
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  font-weight: 700;
+}
+.auth-layout {
+  min-height: calc(100vh - 78px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.auth-visual {
+  position: relative;
+  min-height: 610px;
+  overflow: hidden;
+  background: var(--primary-color);
+}
+.auth-visual img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+}
+.auth-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(25, 39, 32, 0.72),
+    rgba(25, 39, 32, 0.05) 70%
+  );
+}
+.auth-visual-copy {
+  position: absolute;
+  z-index: 1;
+  bottom: 50px;
+  left: max(40px, 8%);
+  max-width: 460px;
+  color: white;
+}
+.auth-visual-copy blockquote {
+  margin: 0;
+  font: 500 38px/1.25 var(--serif);
+}
+.auth-visual-copy p {
+  margin: 16px 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.auth-panel {
+  width: min(500px, calc(100% - 70px));
+  align-self: center;
+  justify-self: center;
+  padding: 55px 0;
+}
+.auth-panel h1 {
+  margin: 0 0 10px;
+  color: var(--primary-color);
+  font: 500 44px/1.1 var(--serif);
+}
+.auth-panel > p {
+  margin: 0 0 27px;
+  color: var(--muted-color);
+  font-size: 12px;
+}
+.auth-form {
+  margin-top: 25px;
+}
+.auth-form .button {
+  width: 100%;
+  margin-top: 5px;
+}
+.auth-switch {
+  margin: 20px 0 0 !important;
+  text-align: center;
+}
+.auth-switch a {
+  color: var(--secondary-color);
+  font-weight: 700;
+}
+.role-switch {
+  display: flex;
+  gap: 5px;
+  margin: 0 0 22px;
+  padding: 4px;
+  background: #eae8df;
+}
+.role-switch a {
+  flex: 1;
+  padding: 9px 5px;
+  color: #636b64;
+  font-size: 10px;
+  text-align: center;
+}
+.role-switch a.is-active {
+  color: var(--primary-color);
+  background: var(--surface-color);
+  box-shadow: 0 1px 4px rgba(36, 48, 42, 0.08);
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  aspect-ratio: 1;
+  background: #e1ded5;
+  border: 0;
+  cursor: zoom-in;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.gallery-item:hover img {
+  transform: scale(1.04);
+}

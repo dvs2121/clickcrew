@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^node <<'NODE'\nconst fs = require\\('fs'\\);\nconst path = require\\('path'\\);\nconst root = path\\.resolve\\('frontend'\\);\nconst htmlFiles = \\[\\];\nfunction walk\\(dir\\) \\{ for \\(const ent of fs\\.readdirSync\\(dir, \\{withFileTypes:true\\}\\)\\) \\{ const full=path\\.join\\(dir,ent\\.name\\); if\\(ent\\.isDirectory\\(\\)\\) walk\\(full\\); else if\\(full\\.endsWith\\('\\.html'\\)\\) htmlFiles\\.push\\(full\\); \\} \\}\nwalk\\(root\\);\nconst missing=\\[\\];\nfor \\(const file of htmlFiles\\) \\{\n const text=fs\\.readFileSync\\(file,'utf8'\\);\n for \\(const match of text\\.matchAll\\(/\\(\\?:src\\|href\\)=\\[\"'\\]\\(\\[\\^\"'\\]\\+\\)\\[\"'\\]/g\\)\\) \\{\n  const ref=match\\[1\\];\n  if \\(/\\^\\(\\?:https\\?:\\|data:\\|mailto:\\|tel:\\|#\\|javascript:\\)/i\\.test\\(ref\\)\\) continue;\n  const clean=decodeURIComponent\\(ref\\.split\\(/\\[\\?#\\]/\\)\\[0\\]\\);\n  const target=path\\.resolve\\(path\\.dirname\\(file\\),clean\\);\n  if \\(!fs\\.existsSync\\(target\\)\\) missing\\.push\\(`\\$\\{path\\.relative\\(root,file\\)\\} -> \\$\\{ref\\}`\\);\n \\}\n\\}\nconsole\\.log\\(`Checked \\$\\{htmlFiles\\.length\\} HTML files\\.`\\);\nconsole\\.log\\(missing\\.length \\? `Missing local references:\\\\n\\$\\{missing\\.join\\('\\\\n'\\)\\}` : 'All local src/href references resolve\\.'\\);\nprocess\\.exitCode=missing\\.length \\? 1 : 0;\nNODE$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

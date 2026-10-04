@@ -1,0 +1,13 @@
+{
+  "name": "clickcrew",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm run frontend\"",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "python3 -m http.server 5500 --directory frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
