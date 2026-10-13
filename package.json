@@ -8,6 +8,6 @@
     "frontend": "python3 -m http.server 5500 --directory frontend"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.5"
   }
 }
