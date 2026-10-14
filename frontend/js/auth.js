@@ -19,7 +19,35 @@ function renderAuthChoice(mode) {
     },
   ];
   const target = document.querySelector("[data-page-content]");
-  target.innerHTML = `<section class="page-hero"><div class="page-hero-inner"><p class="eyebrow">ClickCrew, for everyone behind the moment</p><h1>${verb}.</h1><p>Choose the space that brings you here.</p></div></section><section class="section role-choice-grid">${roles.map((role) => `<a class="role-choice" href="${appUrl(role.href)}"><img src="${role.image}" alt=""><div><p class="eyebrow">${action} as</p><h2>${role.title}</h2><p>${role.detail}</p><span class="text-link">Continue <span aria-hidden="true">→</span></span></div></a>`).join("")}</section><p class="admin-entry"><a href="${appUrl("pages/admin-login.html")}">Admin login</a></p>`;
+  target.innerHTML = `
+    <section class="page-hero">
+      <div class="page-hero-inner">
+        <p class="eyebrow">ClickCrew, for everyone behind the moment</p>
+        <h1>${verb}.</h1>
+        <p>Choose the space that brings you here.</p>
+      </div>
+    </section>
+    <section class="section role-choice-grid">
+      ${roles
+        .map(
+          (role) => `
+            <a class="role-choice" href="${appUrl(role.href)}">
+              <img src="${role.image}" alt="">
+              <div>
+                <p class="eyebrow">${action} as</p>
+                <h2>${role.title}</h2>
+                <p>${role.detail}</p>
+                <span class="text-link">Continue <span aria-hidden="true">→</span></span>
+              </div>
+            </a>`,
+        )
+        .join("")}
+    </section>
+    <div class="admin-entry">
+      <a class="button button-admin" href="${appUrl("pages/admin-login.html")}">
+        Admin Login <span aria-hidden="true">→</span>
+      </a>
+    </div>`;
 }
 
 function renderAuthPage(role, mode) {
@@ -51,7 +79,7 @@ function renderAuthPage(role, mode) {
   const fields = `${isRegister ? `<div class="form-field"><label class="form-label" for="auth-name">Full name</label><input class="form-control" id="auth-name" name="name" autocomplete="name" required></div>` : ""}<div class="form-field"><label class="form-label" for="auth-email">Email address</label><input class="form-control" id="auth-email" type="email" name="email" autocomplete="email" required></div><div class="form-field"><label class="form-label" for="auth-password">Password</label><input class="form-control" id="auth-password" type="password" name="password" autocomplete="${isRegister ? "new-password" : "current-password"}" minlength="${isRegister ? 10 : 1}" required></div>${isRegister && role === "photographer" ? `<div class="form-field"><label class="form-label" for="auth-city">Your city</label><input class="form-control" id="auth-city" name="city" autocomplete="address-level2" required></div>` : ""}`;
 
   const target = document.querySelector("[data-page-content]");
-  target.innerHTML = `<section class="auth-layout"><div class="auth-visual"><img src="${image}" alt="A photographer capturing a meaningful moment"><div class="auth-visual-copy"><blockquote>“The best photographs feel like being there all over again.”</blockquote><p>ClickCrew · ${roleLabel}</p></div></div><div class="auth-panel"><p class="eyebrow">${roleLabel}</p><h1>${action}.</h1><p>${isRegister ? "A few details, then you're on your way." : "Your next favourite memory might be just around the corner."}</p>${!isAdmin ? `<nav class="role-switch" aria-label="Account type"><a class="${role === "customer" ? "is-active" : ""}" href="${appUrl(`pages/customer-${entry}.html`)}">Customer</a><a class="${role === "photographer" ? "is-active" : ""}" href="${appUrl(`pages/photographer-${entry}.html`)}">Photographer</a></nav>` : ""}<form class="auth-form" data-auth-form data-role="${role}" data-mode="${mode}">${fields}<button class="button button-primary" type="submit">${isRegister ? "Create account" : "Log in"} <span aria-hidden="true">→</span></button></form>${!isAdmin ? `<p class="auth-switch">${switchLabel.replace(isRegister ? "Log in" : "Create an account", `<a href="${switchHref}">${isRegister ? "Log in" : "Create an account"}</a>`)}</p>` : ""}<p class="auth-switch"><a href="${appUrl("index.html")}">Back to ClickCrew</a></p></div></section>`;
+  target.innerHTML = `<section class="auth-layout"><div class="auth-visual"><img src="${image}" alt="A photographer capturing a meaningful moment"><div class="auth-visual-copy"><blockquote>“The best photographs feel like being there all over again.”</blockquote><p>ClickCrew · ${roleLabel}</p></div></div><div class="auth-panel"><p class="eyebrow">${roleLabel}</p><h1>${action}.</h1><p>${isRegister ? "A few details, then you're on your way." : "Your next favourite memory might be just around the corner."}</p>${!isAdmin ? `<nav class="role-switch" aria-label="Account type"><a class="${role === "customer" ? "is-active" : ""}" href="${appUrl(`pages/customer-${entry}.html`)}" ${role === "customer" ? 'aria-current="page"' : ""}>Customer</a><a class="${role === "photographer" ? "is-active" : ""}" href="${appUrl(`pages/photographer-${entry}.html`)}" ${role === "photographer" ? 'aria-current="page"' : ""}>Photographer</a></nav>` : ""}<form class="auth-form" data-auth-form data-role="${role}" data-mode="${mode}">${fields}<button class="button button-primary" type="submit">${isRegister ? "Create account" : "Log in"} <span aria-hidden="true">→</span></button></form>${!isAdmin && !isRegister ? `<a class="button button-admin" href="${appUrl("pages/admin-login.html")}">Admin Login</a>` : ""}${!isAdmin ? `<p class="auth-switch">${switchLabel.replace(isRegister ? "Log in" : "Create an account", `<a href="${switchHref}">${isRegister ? "Log in" : "Create an account"}</a>`)}</p>` : ""}<p class="auth-switch"><a href="${appUrl("index.html")}">Back to ClickCrew</a></p></div></section>`;
   target
     .querySelector("[data-auth-form]")
     .addEventListener("submit", submitAuthForm);

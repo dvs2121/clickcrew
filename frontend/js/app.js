@@ -208,15 +208,23 @@ function renderStaticPage(page) {
       .querySelector("[data-contact-form]")
       .addEventListener("submit", async (event) => {
         event.preventDefault();
+        const form = event.currentTarget;
+        const button = form.querySelector("[type=submit]");
+        const originalLabel = button.innerHTML;
+        button.disabled = true;
+        button.textContent = "Sending your message…";
         try {
           await api.post(
             "/contact",
-            Object.fromEntries(new FormData(event.currentTarget)),
+            Object.fromEntries(new FormData(form)),
           );
           showToast("Thanks for writing. We'll be in touch.");
-          event.currentTarget.reset();
-        } catch {
-          showToast("Connect the ClickCrew API to send your message.");
+          form.reset();
+        } catch (error) {
+          showToast(error.message || "Your message could not be sent. Please try again.");
+        } finally {
+          button.disabled = false;
+          button.innerHTML = originalLabel;
         }
       });
     return;
@@ -233,21 +241,26 @@ async function initializePage() {
   if (page === "home") {
     const homeCards = document.querySelector("[data-photographer-grid]");
     const limit = Number(homeCards?.dataset.limit || 4);
-    homeCards.innerHTML = '<div class="empty-state" role="status">Loading photographers…</div>';
+    if (homeCards) {
+      homeCards.innerHTML = `<div class="photographer-skeleton" role="status" aria-label="Loading photographers"><span></span><span></span><span></span><span></span></div>`;
+    }
+    initializeHeroCarousel();
+    bindHomeSearch();
     try {
       await Promise.all([loadPhotographers(), loadFavoriteIds()]);
       renderPhotographerCards(homeCards, photographers, limit);
     } catch (error) {
-      homeCards.innerHTML = `<div class="empty-state" role="alert">${escapeHTML(error.message || "Photographers could not be loaded.")}</div>`;
+      if (homeCards) {
+        homeCards.innerHTML = `<div class="empty-state" role="alert">${escapeHTML(error.message || "Photographers could not be loaded.")}</div>`;
+      }
     }
-    bindHomeSearch();
   } else if (page === "directory" || page === "profile") {
     const target = document.querySelector("[data-page-content]");
     target.innerHTML = '<section class="section"><p class="empty-state" role="status">Loading…</p></section>';
     try {
       const query = new URLSearchParams(window.location.search);
       const filters = Object.fromEntries(
-        ["category", "location", "date", "time", "type"].filter((key) =>
+        ["search", "category", "location", "date", "time", "type"].filter((key) =>
           query.has(key),
         ).map((key) => [key, query.get(key)]),
       );
@@ -258,6 +271,8 @@ async function initializePage() {
           loadFavoriteIds(),
         ]);
         renderDirectory(categories);
+        const searchField = target.querySelector('[name="search"]');
+        if (searchField) searchField.value = query.get("search") || "";
       } else {
         const profileId = query.get("id");
         if (!profileId) throw new Error("This photographer profile is unavailable.");
@@ -302,29 +317,255 @@ async function initializePage() {
 }
 
 function bindHomeSearch() {
-  document.querySelectorAll(".category-choice").forEach((button) =>
+  const form = document.querySelector("[data-search-form]");
+  const intentInput = form?.elements.intent;
+  const searchInput = form?.querySelector("[data-quick-search-input]");
+  const results = form?.querySelector("[data-quick-results]");
+  const submitButton = form?.querySelector("[type=submit]");
+  const photographerFilters = form?.querySelector("[data-photographer-filters]");
+  let requestVersion = 0;
+  const invalidateSearch = () => {
+    requestVersion += 1;
+    submitButton.disabled = false;
+    submitButton.removeAttribute("aria-busy");
+    results.hidden = true;
+    results.replaceChildren();
+  };
+
+  form?.querySelectorAll("[data-search-intent]").forEach((button) =>
     button.addEventListener("click", () => {
+      invalidateSearch();
       document
-        .querySelectorAll(".category-choice")
+        .querySelectorAll("[data-search-intent]")
         .forEach((choice) =>
           choice.classList.toggle("is-selected", choice === button),
         );
-      document.querySelector("[name=category]").value = button.dataset.category;
+      document
+        .querySelectorAll("[data-search-intent]")
+        .forEach((choice) =>
+          choice.setAttribute("aria-pressed", String(choice === button)),
+        );
+      intentInput.value = button.dataset.searchIntent;
+      photographerFilters.hidden = button.dataset.searchIntent !== "photographer";
+      searchInput.placeholder =
+        button.dataset.searchIntent === "lactation"
+          ? "Search for a lactation consultant near you..."
+          : "Search for a photographer near you...";
     }),
   );
-  document
-    .querySelector("[data-search-form]")
-    ?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const values = new FormData(event.currentTarget);
-      const params = new URLSearchParams();
-      ["category", "location", "date", "time", "type"].forEach((key) => {
-        if (values.get(key)) params.set(key, values.get(key));
+  form?.querySelectorAll("[data-search-category]").forEach((button) =>
+    button.addEventListener("click", () => {
+      invalidateSearch();
+      form.querySelectorAll("[data-search-category]").forEach((choice) => {
+        const isSelected = choice === button;
+        choice.classList.toggle("is-selected", isSelected);
+        choice.setAttribute("aria-pressed", String(isSelected));
       });
-      window.location.href = appUrl(
-        `pages/photographers.html?${params.toString()}`,
-      );
+      form.elements.category.value = button.dataset.searchCategory;
+    }),
+  );
+  form?.addEventListener("input", (event) => {
+    if (event.target.matches("input[name=search], input[name=location], input[name=date]")) {
+      invalidateSearch();
+    }
+  });
+  form?.addEventListener("change", (event) => {
+    if (event.target.matches("select[name=time], select[name=type]")) {
+      invalidateSearch();
+    }
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const version = ++requestVersion;
+    const values = new FormData(form);
+    const intent = values.get("intent");
+    const query = String(values.get("search") || "").trim();
+    const location = String(values.get("location") || "").trim();
+    const filters = Object.fromEntries(
+      ["category", "date", "time", "type"].map((key) => [
+        key,
+        String(values.get(key) || ""),
+      ]),
+    );
+    results.hidden = false;
+
+    if (intent === "lactation") {
+      results.innerHTML = `<p class="quick-search-note">Our lactation consultant directory is not available yet. <a href="${appUrl("pages/contact.html")}">Contact our support team</a> and we’ll help point you in the right direction.</p>`;
+      return;
+    }
+
+    results.innerHTML = `<div class="quick-search-loading" role="status"><span class="loading-pulse"></span>Finding photographers${location ? ` near ${escapeHTML(location)}` : ""}…</div>`;
+    submitButton.disabled = true;
+    submitButton.setAttribute("aria-busy", "true");
+    try {
+      const [response] = await Promise.all([
+        api.photographers.list({ search: query, location, ...filters }),
+        loadFavoriteIds(),
+      ]);
+      if (version !== requestVersion) return;
+      const people = Array.isArray(response?.photographers)
+        ? response.photographers
+        : [];
+      const searchParams = new URLSearchParams({ search: query, location, ...filters });
+      results.innerHTML = `<div class="quick-search-result-heading"><strong>${people.length} photographer${people.length === 1 ? "" : "s"} found</strong><a href="${appUrl(`pages/photographers.html?${searchParams}`)}">Browse all <span aria-hidden="true">→</span></a></div><div class="photographer-grid quick-result-grid" data-quick-result-grid></div>`;
+      renderPhotographerCards(results.querySelector("[data-quick-result-grid]"), people, 4);
+      if (!people.length) {
+        results.querySelector("[data-quick-result-grid]").innerHTML =
+          '<div class="empty-state">No photographers match yet. Try another search or location.</div>';
+      }
+    } catch (error) {
+      if (version !== requestVersion) return;
+      results.innerHTML = `<p class="quick-search-note" role="alert">${escapeHTML(error.message || "Search could not be completed. Please try again.")}</p>`;
+    } finally {
+      if (version === requestVersion) {
+        submitButton.disabled = false;
+        submitButton.removeAttribute("aria-busy");
+      }
+    }
+  });
+}
+
+function initializeHeroCarousel() {
+  const carousel = document.querySelector("[data-hero-carousel]");
+  const track = carousel?.querySelector("[data-carousel-track]");
+  const dots = carousel?.querySelector("[data-carousel-dots]");
+  if (!carousel || !track || !dots) return;
+
+  const slides = [
+    ["photo-1511285560929-80b456fea0bc", "A couple celebrating their wedding outdoors"],
+    ["photo-1519741497674-611481863552", "A joyful wedding moment"],
+    ["photo-1532712938310-34cb3982ef74", "A couple enjoying a quiet moment"],
+    ["photo-1476514525535-07fb3b4ae5f1", "A scenic travel moment"],
+    ["photo-1530103862676-de8c9debad1d", "A birthday celebration"],
+    ["photo-1523580494863-6f3031224c94", "A joyful college celebration"],
+    ["photo-1534528741775-53994a69daeb", "A relaxed portrait session"],
+    ["photo-1518621736915-f3b1c41bfd00", "A romantic proposal"],
+    ["photo-1492684223066-81342ee5ff30", "Friends celebrating together"],
+    ["photo-1452587925148-ce544e77e70d", "A photographer at work"],
+  ];
+  const sourceFor = (id) =>
+    `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1500&q=85`;
+  let activeIndex = 0;
+  let intervalId;
+  let pointerStartX = null;
+  let isHovered = false;
+  let hasFocus = false;
+  let isRotationPaused = false;
+  const pauseButton = carousel.querySelector("[data-carousel-pause]");
+
+  track.innerHTML = slides
+    .map(
+      ([imageId, description], index) => `
+        <div class="hero-carousel-slide${index === 0 ? " is-active" : ""}" data-carousel-slide aria-roledescription="slide" aria-label="${index + 1} of ${slides.length}" aria-hidden="${index !== 0}">
+          <img class="hero-image" data-carousel-image data-src="${sourceFor(imageId)}" alt="${description}" ${index === 0 ? `src="${sourceFor(imageId)}" fetchpriority="high"` : 'loading="lazy"'} decoding="async">
+        </div>`,
+    )
+    .join("");
+  dots.innerHTML = slides
+    .map(
+      (_, index) =>
+        `<button class="carousel-dot${index === 0 ? " is-active" : ""}" type="button" data-carousel-dot="${index}" aria-label="Show image ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`,
+    )
+    .join("");
+
+  const slideElements = [...track.querySelectorAll("[data-carousel-slide]")];
+  const dotElements = [...dots.querySelectorAll("[data-carousel-dot]")];
+  const counter = document.querySelector("[data-carousel-counter]");
+  const showSlide = (index) => {
+    activeIndex = (index + slides.length) % slides.length;
+    slideElements.forEach((slide, slideIndex) => {
+      const isActive = slideIndex === activeIndex;
+      slide.classList.toggle("is-active", isActive);
+      slide.setAttribute("aria-hidden", String(!isActive));
+      slide.inert = !isActive;
+      if (isActive) {
+        const image = slide.querySelector("[data-carousel-image]");
+        if (!image.src) image.src = image.dataset.src;
+      }
     });
+    dotElements.forEach((dot, dotIndex) => {
+      const isActive = dotIndex === activeIndex;
+      dot.classList.toggle("is-active", isActive);
+      dot.setAttribute("aria-current", String(isActive));
+    });
+    if (counter) counter.textContent = String(activeIndex + 1).padStart(2, "0");
+    // Load only the active and next images; the remaining slots stay lazy until needed.
+    const nextImage = slideElements[(activeIndex + 1) % slides.length]
+      .querySelector("[data-carousel-image]");
+    if (!nextImage.src) nextImage.src = nextImage.dataset.src;
+  };
+
+  const stopRotation = () => window.clearInterval(intervalId);
+  const startRotation = (resumeWhileInteracting = false) => {
+    stopRotation();
+    if (
+      ((isHovered || hasFocus) && !resumeWhileInteracting) ||
+      isRotationPaused ||
+      document.hidden ||
+      slides.length < 2 ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
+    intervalId = window.setInterval(() => showSlide(activeIndex + 1), 5000);
+  };
+  carousel.querySelector("[data-carousel-previous]").addEventListener("click", () => {
+    showSlide(activeIndex - 1);
+    startRotation();
+  });
+  carousel.querySelector("[data-carousel-next]").addEventListener("click", () => {
+    showSlide(activeIndex + 1);
+    startRotation();
+  });
+  dotElements.forEach((dot) =>
+    dot.addEventListener("click", () => {
+      showSlide(Number(dot.dataset.carouselDot));
+      startRotation();
+    }),
+  );
+  carousel.addEventListener("mouseenter", () => {
+    isHovered = true;
+    stopRotation();
+  });
+  carousel.addEventListener("mouseleave", () => {
+    isHovered = false;
+    startRotation();
+  });
+  carousel.addEventListener("focusin", () => {
+    hasFocus = true;
+    stopRotation();
+  });
+  carousel.addEventListener("focusout", (event) => {
+    if (!carousel.contains(event.relatedTarget)) {
+      hasFocus = false;
+      startRotation();
+    }
+  });
+  pauseButton.addEventListener("click", () => {
+    isRotationPaused = !isRotationPaused;
+    pauseButton.setAttribute("aria-pressed", String(isRotationPaused));
+    pauseButton.setAttribute(
+      "aria-label",
+      isRotationPaused ? "Resume automatic slideshow" : "Pause automatic slideshow",
+    );
+    pauseButton.textContent = isRotationPaused ? "▶" : "Ⅱ";
+    if (isRotationPaused) stopRotation();
+    else startRotation(true);
+  });
+  track.addEventListener("pointerdown", (event) => {
+    pointerStartX = event.pointerType === "touch" ? event.clientX : null;
+  });
+  track.addEventListener("pointerup", (event) => {
+    if (pointerStartX === null) return;
+    const deltaX = event.clientX - pointerStartX;
+    pointerStartX = null;
+    if (Math.abs(deltaX) > 45) showSlide(activeIndex + (deltaX < 0 ? 1 : -1));
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopRotation();
+    else startRotation();
+  });
+  showSlide(0);
+  startRotation();
 }
 
 if (document.readyState === "loading") {

@@ -387,26 +387,27 @@ body.developer-dialog-open {
 }
 
 .developer-socials a {
-  display: grid;
-  width: 46px;
-  height: 46px;
+  display: inline-flex;
+  min-width: 46px;
+  min-height: 42px;
   flex: 0 0 auto;
-  place-items: center;
-  padding: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
   color: var(--developer-ink);
   background: rgba(255, 254, 250, 0.6);
   border: 1px solid var(--developer-line);
-  border-radius: 50%;
+  border-radius: 24px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
   transition:
     color 180ms ease,
     background-color 180ms ease,
     border-color 180ms ease,
     transform 180ms ease,
     box-shadow 180ms ease;
-}
-
-.developer-socials a:nth-child(2) {
-  transform: translateY(3px);
 }
 
 .developer-socials a:hover {
@@ -425,13 +426,6 @@ body.developer-dialog-open {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.7;
-}
-
-.developer-instagram-handle {
-  margin: 9px 0 0;
-  color: var(--developer-muted);
-  font-size: 9px;
-  letter-spacing: 0.02em;
 }
 
 .developer-dialog__footer {
@@ -649,8 +643,8 @@ body.developer-dialog-open {
   }
 
   .developer-socials a {
-    width: 48px;
-    height: 48px;
+    min-height: 42px;
+    padding: 0 12px;
   }
 
   .developer-dialog__footer {

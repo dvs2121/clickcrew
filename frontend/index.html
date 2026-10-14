@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f4f1eb" />
     <meta
       name="description"
-      content="Find and book photographers for the moments worth keeping. Choose your photographer, camera and package with ClickCrew."
+      content="Find trusted photographers for the moments worth keeping. Compare portfolios, transparent pricing and customer reviews with ClickCrew."
     />
     <title>ClickCrew | Your moment deserves more than a camera</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,17 +41,15 @@
             <span>Your moment deserves</span><span>more than a camera.</span>
           </h1>
           <p class="hero-description">
-            Book the right photographer, choose your camera, and capture your
-            moment exactly the way you want.
+            Find a photographer who understands your moment, compare real work
+            and transparent pricing, then plan your session with confidence.
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="pages/photographers.html"
               >Find a Photographer <span aria-hidden="true">→</span></a
             >
-            <a
-              class="button button-outline"
-              href="pages/photographer-register.html"
-              >Become a Photographer</a
+            <a class="button button-outline" href="pages/contact.html"
+              >Need Help? Contact Support</a
             >
           </div>
           <div class="hero-note">
@@ -70,89 +68,105 @@
           class="hero-visual"
           aria-label="A photographer capturing a couple outdoors"
         >
-          <div class="hero-orbit hero-orbit-one"></div>
-          <div class="hero-orbit hero-orbit-two"></div>
-          <img
-            class="hero-image"
-            src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1500&q=88"
-            alt="Photographer capturing a couple's wedding outdoors"
-          />
-          <figure class="print-photo">
-            <img
-              src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=520&q=85"
-              alt="A joyful wedding moment, captured on film"
-            />
-            <figcaption>the little things, forever</figcaption>
-          </figure>
-          <div class="hero-image-caption">
-            <span class="caption-dot"></span> MADE TO BE REMEMBERED
+          <div
+            class="hero-carousel"
+            data-hero-carousel
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Moments captured by ClickCrew photographers"
+          >
+            <div class="hero-carousel-track" data-carousel-track></div>
+            <button
+              class="carousel-control carousel-previous"
+              type="button"
+              data-carousel-previous
+              aria-label="Show previous image"
+            >←</button>
+            <button
+              class="carousel-control carousel-next"
+              type="button"
+              data-carousel-next
+              aria-label="Show next image"
+            >→</button>
+            <button
+              class="carousel-pause"
+              type="button"
+              data-carousel-pause
+              aria-label="Pause automatic slideshow"
+              aria-pressed="false"
+            >Ⅱ</button>
+            <div class="carousel-dots" data-carousel-dots aria-label="Choose an image"></div>
           </div>
         </div>
-        <div class="hero-index" aria-hidden="true">01 <span></span> 04</div>
+        <div class="hero-index" aria-hidden="true"><span data-carousel-counter>01</span> <i></i> 10</div>
       </section>
 
-      <section class="search-band-wrap" aria-label="Find a photographer">
-        <form class="search-panel" data-search-form>
+      <section class="search-band-wrap" aria-label="Quick search">
+        <form class="search-panel quick-search-panel" data-search-form>
           <div class="search-panel-heading">
-            <p class="eyebrow">A good place to start</p>
-            <h2>What are you capturing?</h2>
+            <p class="eyebrow">Find trusted local support</p>
+            <h2>Who are you looking for?</h2>
           </div>
           <div
-            class="category-choices"
+            class="category-choices search-intents"
             role="group"
-            aria-label="Choose an event category"
+            aria-label="Choose a service"
           >
             <button
               type="button"
               class="category-choice is-selected"
-              data-category="Wedding"
+              data-search-intent="photographer"
+              aria-pressed="true"
             >
-              Wedding
+              Photographer
             </button>
             <button
               type="button"
               class="category-choice"
-              data-category="Birthday"
+              data-search-intent="lactation"
+              aria-pressed="false"
             >
-              Birthday
-            </button>
-            <button
-              type="button"
-              class="category-choice"
-              data-category="Couple"
-            >
-              Couple
-            </button>
-            <button
-              type="button"
-              class="category-choice"
-              data-category="Travel"
-            >
-              Travel
-            </button>
-            <button type="button" class="category-choice" data-category="Party">
-              Party
-            </button>
-            <button
-              type="button"
-              class="category-choice"
-              data-category="College Events"
-            >
-              College events
-            </button>
-            <button
-              type="button"
-              class="category-choice"
-              data-category="Personal Shoot"
-            >
-              Personal shoot
-            </button>
-            <button type="button" class="category-choice" data-category="Other">
-              Other
+              Lactation consultant
             </button>
           </div>
-          <input type="hidden" name="category" value="Wedding" />
-          <div class="search-fields">
+          <div class="quick-photographer-filters" data-photographer-filters>
+            <div
+              class="category-choices photographer-categories"
+              role="group"
+              aria-label="Choose a photography event category"
+            >
+              <button type="button" class="category-choice is-selected" data-search-category="Wedding" aria-pressed="true">Wedding</button>
+              <button type="button" class="category-choice" data-search-category="Birthday" aria-pressed="false">Birthday</button>
+              <button type="button" class="category-choice" data-search-category="Couple" aria-pressed="false">Couple</button>
+              <button type="button" class="category-choice" data-search-category="Travel" aria-pressed="false">Travel</button>
+              <button type="button" class="category-choice" data-search-category="Party" aria-pressed="false">Party</button>
+              <button type="button" class="category-choice" data-search-category="College Events" aria-pressed="false">College events</button>
+              <button type="button" class="category-choice" data-search-category="Personal Shoot" aria-pressed="false">Personal shoot</button>
+              <button type="button" class="category-choice" data-search-category="Other" aria-pressed="false">Other</button>
+            </div>
+            <input type="hidden" name="intent" value="photographer" />
+            <input type="hidden" name="category" value="Wedding" />
+            <details class="quick-advanced-filters">
+              <summary>More photographer filters</summary>
+              <div class="quick-extra-fields">
+                <label><span>Event date</span><input type="date" name="date" aria-label="Event date" /></label>
+                <label><span>Preferred time</span><select name="time" aria-label="Preferred time"><option value="">Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label>
+                <label><span>Photography style</span><select name="type" aria-label="Photography style"><option value="">Any style</option><option>Candid</option><option>Traditional</option><option>Portrait</option><option>Film</option></select></label>
+              </div>
+            </details>
+          </div>
+          <div class="search-fields quick-search-fields">
+            <label class="search-field"
+              ><span class="field-icon" aria-hidden="true">⌖</span
+              ><span class="field-label">Service or keyword</span
+              ><input
+                type="search"
+                name="search"
+                placeholder="Search for a lactation consultant or photographer near you..."
+                autocomplete="off"
+                aria-label="Search for a service"
+                data-quick-search-input
+            /></label>
             <label class="search-field"
               ><span class="field-icon" aria-hidden="true">⌖</span
               ><span class="field-label">Location</span
@@ -161,36 +175,11 @@
                 placeholder="City or area"
                 autocomplete="address-level2"
             /></label>
-            <label class="search-field"
-              ><span class="field-icon" aria-hidden="true">▦</span
-              ><span class="field-label">Date</span
-              ><input type="date" name="date" aria-label="Event date"
-            /></label>
-            <label class="search-field"
-              ><span class="field-icon" aria-hidden="true">◷</span
-              ><span class="field-label">Time</span
-              ><select name="time">
-                <option value="">Any time</option>
-                <option>Morning</option>
-                <option>Afternoon</option>
-                <option>Evening</option>
-              </select></label
-            >
-            <label class="search-field"
-              ><span class="field-icon" aria-hidden="true">◉</span
-              ><span class="field-label">Photography type</span
-              ><select name="type">
-                <option value="">Any style</option>
-                <option>Candid</option>
-                <option>Traditional</option>
-                <option>Portrait</option>
-                <option>Film</option>
-              </select></label
-            >
             <button class="button button-primary search-submit" type="submit">
-              Search Photographers <span aria-hidden="true">→</span>
+              Search <span aria-hidden="true">→</span>
             </button>
           </div>
+          <div class="quick-search-results" data-quick-results aria-live="polite" hidden></div>
         </form>
       </section>
 
@@ -201,17 +190,17 @@
             <h2>Photography,<br />booked your way.</h2>
           </div>
           <p>
-            Choose your camera, pick your photographer, customize your package —
-            and get stunning photos, exactly the way you want them.
+            Browse real portfolios, compare clear starting prices, and contact
+            the photographer who feels right for your day.
           </p>
         </div>
         <div class="benefit-grid">
           <article class="benefit-item reveal">
             <span class="round-icon" aria-hidden="true">◎</span>
-            <h3>Choose your camera</h3>
+            <h3>Find your photographer</h3>
             <p>
-              From a phone camera to a full-frame favourite, the choice is
-              yours.
+              Discover thoughtful, talented photographers in your corner of
+              India.
             </p>
           </article>
           <article class="benefit-item reveal">
@@ -381,8 +370,8 @@
           <article class="process-step reveal">
             <span class="step-number">03</span
             ><span class="process-icon" aria-hidden="true">▧</span>
-            <h3>Choose your camera & package</h3>
-            <p>Pick the gear and coverage that feel right.</p>
+            <h3>Share your session details</h3>
+            <p>Choose a date, time, place and the kind of moment to capture.</p>
           </article>
           <article class="process-step reveal">
             <span class="step-number">04</span
@@ -428,8 +417,8 @@
                 /><span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
               </div>
               <blockquote>
-                “I loved being able to choose the camera, too. The photos feel
-                like us, not like a photoshoot.”
+                “I loved finding someone whose work felt like us. The photos
+                are full of the little moments we might have missed.”
               </blockquote>
               <div class="review-person">
                 <strong>Rohan Mehta</strong><span>Couple shoot · Jaipur</span>
